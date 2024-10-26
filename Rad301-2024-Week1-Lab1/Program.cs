@@ -114,13 +114,23 @@ namespace Rad301_2024_Week1_Lab1
                         on s.SupplierId equals s2.SupplierId
                         join p in model.Products
                         on s.ProductId equals p.ProductId
+                        orderby s2.SupplierName
                         select new
                         {
                             s2.SupplierName,
                             p.Description
                         };
+            var query2 = model.SuppliersProducts
+                        .Join(model.Suppliers, sp => sp.SupplierId, s => s.SupplierId, (sp, s) => new { sp, s })
+                        .Join(model.Products, ssp => ssp.sp.ProductId, p => p.ProductId, (ssp, p) => new { ssp, p })
+                        .OrderBy(o => o.ssp.s.SupplierName)
+                        .Select(obj => new
+                        {
+                            obj.ssp.s.SupplierName,
+                            obj.p.Description
+                        });
             Console.WriteLine("== SUPPLIERS WITH THEIR PRODUCTS ==");
-            foreach(var s in query)
+            foreach(var s in query2)
             {
                 Console.WriteLine($"{s.SupplierName} - {s.Description}");
             }
